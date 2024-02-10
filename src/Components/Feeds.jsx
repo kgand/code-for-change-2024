@@ -126,9 +126,11 @@ const Feeds = () => {
         const allPosts = snapshot.docs.map((doc) => {
           return doc.data();
         });
-        setPosts(allPosts);
+        const filteredPosts = allPosts.filter(post => post.uid !== currentUser.uid);
+        setPosts(filteredPosts);
       });
   }, []);
+
 
   return (
     <div>
