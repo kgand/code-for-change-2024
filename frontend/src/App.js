@@ -4,7 +4,7 @@ import React, {Component} from 'react';
 import ReactScrollWheelHandler from "react-scroll-wheel-handler";
 import ReactPlayer from 'react-player';
 
-class Feed extends React.Component
+class App extends React.Component
 {
   state = 
   {
@@ -53,7 +53,7 @@ class Feed extends React.Component
       </div>
     );
   }
-};\
+};
 
 
 
