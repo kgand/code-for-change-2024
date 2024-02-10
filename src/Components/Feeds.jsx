@@ -97,38 +97,17 @@ const Feeds = () => {
   function videoInteractionCallback(entries) {
     entries.forEach((entry) => {
       let child = entry.target.children[0];
-  
-      // Check if child is a video element
-      if (child instanceof HTMLVideoElement) {
-        // Check if the video has metadata loaded before attempting to play
-        if (child.readyState >= 1) {
-          child.play().then(() => {
-            // Video playback started successfully
-            if (entry.isIntersecting === false) {
-              child.pause();
-            }
-          }).catch((error) => {
-            // Handle play() promise rejection (e.g., autoplay policy)
-            console.error('Failed to play video:', error);
-          });
-        } else {
-          // Metadata not loaded yet, wait for 'loadedmetadata' event
-          child.addEventListener('loadedmetadata', () => {
-            child.play().then(() => {
-              // Video playback started successfully
-              if (entry.isIntersecting === false) {
-                child.pause();
-              }
-            }).catch((error) => {
-              // Handle play() promise rejection (e.g., autoplay policy)
-              console.error('Failed to play video:', error);
-            });
-          });
+
+      child.play().then(function () {
+        if (entry.isIntersecting === false) {
+          child.pause();
         }
-      }
+      })
+      .catch(error => {
+        console.log(error);
+    })
     });
   }
-  
 
   useEffect(() => {
     const observerObject = new IntersectionObserver(videoInteractionCallback, conditionObject);

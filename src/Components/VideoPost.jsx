@@ -28,7 +28,7 @@ const VideoPost = (props) => {
 
   let classes = useStyles();
 
-
+ 
   const toggleLikeIcon = async () =>{
     if(isLiked){
       let postDoc = props.postObj;
@@ -59,8 +59,6 @@ const VideoPost = (props) => {
     let doc = await firebaseDB.collection("users").doc(uid).get();
     let user = doc.data();
     let likes = props.postObj.likes;
-
-
 
     if (likes.includes(currentUser.uid)) {
       setIsLiked(true);
@@ -115,8 +113,9 @@ const VideoPost = (props) => {
             <Typography variant="subtitle1">Liked by {likesCount} others </Typography>
           </div>
         )}
-      
+        
 
+        
       </Card>
     </Container>
   );
