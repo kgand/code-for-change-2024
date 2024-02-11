@@ -103,9 +103,9 @@ const Feeds = () => {
         });
         
         console.log("All posts from database:", allPosts);
-
+        const filteredPostsInit = allPosts.filter(post => post.uid !== currentUser.uid);
         // Filter posts based on selected tags
-        const filteredPosts = allPosts.filter(post => {
+        const filteredPosts = filteredPostsInit.filter(post => {
           if (headerGender === "all" && headerClothingType !== "all") {
               return post.tags && post.tags.clothingType === headerClothingType;
           } else if (headerClothingType === "all" && headerGender !== "all") {
