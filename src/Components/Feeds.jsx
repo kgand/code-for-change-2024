@@ -164,7 +164,7 @@ const Feeds = () => {
                 <option value="">Select Clothing Type</option>
                 <option value="top">Top</option>
                 <option value="bottom">Bottom</option>
-                <option value="shoes">Shoes</option>
+                <option value="shoe">Shoes</option>
               </select>
             </div>
           </DialogContent>
