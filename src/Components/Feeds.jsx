@@ -61,6 +61,7 @@ const Feeds = () => {
         await firebaseDB.collection("posts").doc(pid).set({
           pid,
           uid,
+          comments: [],
           likes: [],
           videoLink: videoUrl,
           createdAt: timeStamp(),
@@ -127,6 +128,7 @@ const Feeds = () => {
         setPosts(filteredPosts);
       });
   }, [gender, clothingType, headerGender, headerClothingType]);
+
 
 
 

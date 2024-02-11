@@ -19,7 +19,6 @@ function App() {
     // Conditional Routing - can access profile and feed page only when logged in
     <Router>
       <div className="App">
-
         <Switch>
           {currentUser ? (
             <>
@@ -34,8 +33,7 @@ function App() {
               <Redirect to="/login"></Redirect>
             </>
           )}
- 
-          </Switch>
+        </Switch>
       </div>
     </Router>
   );

@@ -25,6 +25,10 @@ const Header = () => {
     const [profilePic, setProfilePic] = useState(null);
     const [anchorElGender, setAnchorElGender] = useState(null);
     const [anchorElClothing, setAnchorElClothing] = useState(null);
+    const [filterTags, setFilterTags] = useState({
+        gender: 'all',
+        clothingType: 'all'
+    });
     const { selectedTags, setSelectedTags } = useFilter();
 
     const classes = useStyles();
@@ -39,8 +43,13 @@ const Header = () => {
     };
 
     const handleFilter = (category, value) => {
+        console.log(`Filter selected - Category: ${category}, Value: ${value}`);
         setSelectedTags({...selectedTags, [category]: value })
         handleClose(category);
+        // Perform filtering logic here based on selected tags
+        // Update your video display accordingly
+        // For example:
+        // fetchVideosByTags(value);
     };
 
     useEffect(() => {
@@ -75,9 +84,9 @@ const Header = () => {
     };
 
     return (
-        <AppBar id="header" position="sticky" style={{ background: '#FA4616', marginBottom: "1rem" }}>
+        <AppBar id="header" position="sticky" style={{ background: '#ff6f00b2', marginBottom: "1rem" }}>
             <Toolbar>
-                <Typography variant="body">SMART GATOR</Typography>
+                <Typography variant="body">Reel Thrift</Typography>
                 <div className={classes.grow} />
                 <div>
                     <Button

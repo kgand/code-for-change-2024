@@ -6,11 +6,11 @@ import { AuthProvider } from "./context/AuthProvider";
 import { FilterProvider } from "./FilterContext";
 
 ReactDOM.render(
-    <AuthProvider>
-      <FilterProvider>
-      <App />
-      </FilterProvider>
-    </AuthProvider>,
-    
-  document.getElementById("root")
+  <AuthProvider>
+    <FilterProvider>
+    <App />
+    </FilterProvider>
+  </AuthProvider>,
+
+document.getElementById("root")
 );
