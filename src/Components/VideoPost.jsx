@@ -19,6 +19,8 @@ const VideoPost = (props) => {
   let [user, setUser] = useState(null);
   let [likesCount, setLikesCount] = useState(null);
   let [isLiked, setIsLiked] = useState(false); 
+  let [comment, setComment] = useState("");
+  let [commentList, setCommentList] = useState([]);
 
   let { currentUser } = useContext(AuthContext);
 
@@ -29,7 +31,31 @@ const VideoPost = (props) => {
   });
 
   let classes = useStyles();
+  const addCommentToCommentList = async (e) => {
+    let profilePic;
+    if (currentUser.uid == user.userId) {
+      profilePic = user.profileImageUrl;
+    } 
+    else {
+      let doc = await firebaseDB.collection("users").doc(currentUser.uid).get();
+      let user = doc.data();
+      profilePic = user.profileImageUrl;
+    }
+    let newCommentList = [
+      ...commentList,
+      {
+        profilePic: profilePic,
+        comment: comment,
+      },
+    ];
 
+    // add comments in firebase
+    let postObject = props.postObj;
+    postObject.comments.push({ uid: currentUser.uid, comment: comment });
+    await firebaseDB.collection("posts").doc(postObject.pid).set(postObject);
+    setCommentList(newCommentList);
+    setComment("");
+  };
   const redirectToProfile = (userId) => {
     window.location.href = `http://localhost:3000/profile/${userId}`;
   }
@@ -64,7 +90,17 @@ const VideoPost = (props) => {
     let doc = await firebaseDB.collection("users").doc(uid).get();
     let user = doc.data();
     let likes = props.postObj.likes;
+    let updatedCommentList = [];
 
+    for (let i = 0; i < commentList.length; i++) {
+      let commentObj = commentList[i];
+      let doc = await firebaseDB.collection("users").doc(commentObj.uid).get();
+      let commentUserPic = doc.data().profileImageUrl;
+      updatedCommentList.push({
+        profilePic: commentUserPic,
+        comment: commentObj.comment,
+      });
+    }
     if (likes.includes(currentUser.uid)) {
       setIsLiked(true);
       setLikesCount(likes.length);
@@ -74,6 +110,7 @@ const VideoPost = (props) => {
       }
     }
     setUser(user);
+    setCommentList(updatedCommentList);
   }, []); 
 
   return (
@@ -118,6 +155,35 @@ const VideoPost = (props) => {
             <Typography variant="subtitle1">Liked by {likesCount} others </Typography>
           </div>
         )}
+                <Typography variant="subtitle1">Comments</Typography>
+        <TextField
+          variant="outlined"
+          label="Add a comment"
+          size="small"
+          style = {{ width:"100%", marginTop:"0.5rem" }}
+          value={comment}
+          onChange={(e) => {
+            setComment(e.target.value);
+          }}
+        ></TextField>
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={addCommentToCommentList}
+          disabled={comment.trim().length === 0}
+          style={{ marginTop:"1rem" }}
+        >
+          Post
+        </Button>
+
+        {commentList.map((commentObj) => {
+          return (
+            <div style={{display:"flex" }}>
+              <Avatar src={commentObj.profilePic} style={{marginTop:"1rem"}}></Avatar>
+              <Typography variant="subtitle1" style={{ marginLeft:"0.5rem" , marginTop:"1.2rem"}}>{commentObj.comment}</Typography>
+            </div>
+          );
+        })}
         
 
         

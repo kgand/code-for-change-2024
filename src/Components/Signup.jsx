@@ -106,7 +106,7 @@ const Signup = (props) => {
                 style={{ height: "5rem", backgroundSize: "contain" }}
               ></CardMedia>
               <Typography style={{ textAlign: "center", color: '#718093'}} variant='subtitle1'>
-                Sign up to see photos and videos from your friends.
+                Where pre-loved clothes a second story!
               </Typography>
               <CardContent className={classes.centerElements}>
               <TextField

@@ -6,6 +6,7 @@ import { useFilter } from '../FilterContext';
 import { firebaseDB } from "../config/firebase";
 import Avatar from '@material-ui/core/Avatar';
 import HomeIcon from '@material-ui/icons/Home';
+import logo from '../logo.png'; // Import your logo image
 
 const useStyles = makeStyles((theme) => ({
     grow: {
@@ -17,6 +18,11 @@ const useStyles = makeStyles((theme) => ({
     },
     menuButton: {
         marginRight: theme.spacing(2),
+    },
+    logo: {
+        marginRight: theme.spacing(1), // Adjust margin if needed
+        height: 'auto', // Ensure the logo scales properly
+        maxHeight: 40, // Set a maximum height if needed
     },
 }));
 
@@ -75,16 +81,16 @@ const Header = () => {
     };
 
     return (
-        <AppBar id="header" position="sticky" style={{ background: '#FA4616', marginBottom: "1rem" }}>
+        <AppBar id="header" position="sticky" style={{ background: '#ff6f00b2', marginBottom: "1rem" }}>
             <Toolbar>
-                <Typography variant="body">SMART GATOR</Typography>
+            <img src={logo} alt="Logo" className={classes.logo} />
                 <div className={classes.grow} />
                 <div>
                     <Button
                         aria-controls="gender-menu"
                         aria-haspopup="true"
                         onClick={(event) => handleMenuClick(event, 'gender')}
-                        color="inherit"
+                        color="black"
                         className={classes.menuButton}
                     >
                         Gender
@@ -104,7 +110,7 @@ const Header = () => {
                         aria-controls="clothing-menu"
                         aria-haspopup="true"
                         onClick={(event) => handleMenuClick(event, 'clothingType')}
-                        color="inherit"
+                        color="black"
                         className={classes.menuButton}
                     >
                         Clothing Type

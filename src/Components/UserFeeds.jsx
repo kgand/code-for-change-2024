@@ -56,6 +56,7 @@ const UserFeeds = (userId) => {
         await firebaseDB.collection("posts").doc(pid).set({
           pid,
           uid,
+          comments: [],
           likes: [],
           videoLink: videoUrl,
           createdAt: timeStamp(),
