@@ -1,11 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthProvider";
-import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle} from "@material-ui/core";
+import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle } from "@material-ui/core";
 import PhotoCamera from "@material-ui/icons/PhotoCamera";
 import { firebaseDB, firebaseStorage, timeStamp } from "../config/firebase";
 import { v4 as uuid } from "uuid";
 import VideoPost from "./VideoPost";
-import Header from './Header';
+import Header from "./Header";
+import { useFilter } from "../FilterContext";
 
 const Feeds = () => {
   const MAX_FILE_SIZE_LIMIT_IN_MB = 20;
@@ -15,6 +16,10 @@ const Feeds = () => {
   const [uploadVideoError, setUploadVideoError] = useState("");
   const { currentUser } = useContext(AuthContext);
   const [openModal, setOpenModal] = useState(false);
+  const { selectedTags } = useFilter();
+  const { gender: headerGender, clothingType: headerClothingType } = selectedTags;
+  let [gender, setGender] = useState('');
+  let [clothingType, setClothingType] = useState('');
 
   const handleInputFile = (e) => {
     const file = e.target.files[0];
@@ -52,20 +57,19 @@ const Feeds = () => {
       async function fun3() {
         const videoUrl = await uploadVideoObject.snapshot.ref.getDownloadURL();
         const pid = uuid();
-
+      
         await firebaseDB.collection("posts").doc(pid).set({
           pid,
           uid,
           likes: [],
           videoLink: videoUrl,
           createdAt: timeStamp(),
+          tags: { gender, clothingType }, // Include tags here
         });
-
-        const doc = await firebaseDB.collection("users").doc(uid).get();
-        const document = doc.data();
-        document.postsCreated.push(pid);
-        await firebaseDB.collection("users").doc(uid).set(document);
-
+      
+        // Reset state after upload
+        setGender('');
+        setClothingType('');
         setUploadVideoError("");
         setProgress(0);
       }
@@ -88,36 +92,6 @@ const Feeds = () => {
     setOpenModal(false);
   }; 
 
-  //Intersetion Observer Settings
-  let conditionObject = {
-    root: null, 
-    threshold: "0.8",
-  };
-
-  function videoInteractionCallback(entries) {
-    entries.forEach((entry) => {
-      let child = entry.target.children[0];
-
-      child.play().then(function () {
-        if (entry.isIntersecting === false) {
-          child.pause();
-        }
-      })
-      .catch(error => {
-        console.log(error);
-    })
-    });
-  }
-
-  useEffect(() => {
-    const observerObject = new IntersectionObserver(videoInteractionCallback, conditionObject);
-    const elements = document.querySelectorAll(".video-container");
-
-    elements.forEach((el) => {
-      observerObject.observe(el);
-    });
-  }, [posts]);
-
   useEffect(() => {
     firebaseDB
       .collection("posts")
@@ -126,9 +100,36 @@ const Feeds = () => {
         const allPosts = snapshot.docs.map((doc) => {
           return doc.data();
         });
-        setPosts(allPosts);
+        
+        console.log("All posts from database:", allPosts);
+
+        // Filter posts based on selected tags
+        const filteredPosts = allPosts.filter(post => {
+          if (headerGender === "all" && headerClothingType !== "all") {
+              return post.tags && post.tags.clothingType === headerClothingType;
+          } else if (headerClothingType === "all" && headerGender !== "all") {
+              return post.tags && post.tags.gender === headerGender;
+          } else if (headerGender === "all" && headerClothingType === "all") {
+              return true; // Show all posts
+          } else if (headerGender && headerClothingType) {
+              return post.tags && post.tags.gender === headerGender && post.tags.clothingType === headerClothingType;
+          } else if (headerGender) {
+              return post.tags && post.tags.gender === headerGender;
+          } else if (headerClothingType) {
+              return post.tags && post.tags.clothingType === headerClothingType;
+          } else {
+              return true; // No filtering
+          }
       });
-  }, []);
+
+        console.log("Filtered posts based on tags:", headerGender);
+
+        setPosts(filteredPosts);
+      });
+  }, [gender, clothingType, headerGender, headerClothingType]);
+
+
+
 
   return (
     <div>
@@ -147,8 +148,25 @@ const Feeds = () => {
           <Dialog open={openModal} onClose={closeUploadModal}>
             <DialogTitle>Select a video file</DialogTitle>
             <DialogContent>
-              <input type="file" onChange={handleInputFile} />
-            </DialogContent>
+            <input type="file" onChange={handleInputFile} />
+            <div>
+              <label>Gender:</label>
+              <select value={gender} onChange={(e) => setGender(e.target.value)}>
+                <option value="">Select Gender</option>
+                <option value="men">Men</option>
+                <option value="women">Women</option>
+              </select>
+            </div>
+            <div>
+              <label>Clothing Type:</label>
+              <select value={clothingType} onChange={(e) => setClothingType(e.target.value)}>
+                <option value="">Select Clothing Type</option>
+                <option value="top">Top</option>
+                <option value="bottom">Bottom</option>
+                <option value="shoes">Shoes</option>
+              </select>
+            </div>
+          </DialogContent>
             <div style={{ textAlign: "center", color: "red", fontSize: "10pt", marginTop: "1rem" }}>
               {uploadVideoError}
             </div>
