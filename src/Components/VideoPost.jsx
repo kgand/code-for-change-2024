@@ -31,16 +31,16 @@ const VideoPost = (props) => {
   });
 
   let classes = useStyles();
-  const addCommentToCommentList = async (e) => {
+  const addCommentToCommentList = async () => {
     let profilePic;
-    if (currentUser.uid == user.userId) {
+    if (currentUser.uid === user.userId) {
       profilePic = user.profileImageUrl;
-    } 
-    else {
+    } else {
       let doc = await firebaseDB.collection("users").doc(currentUser.uid).get();
       let user = doc.data();
       profilePic = user.profileImageUrl;
     }
+  
     let newCommentList = [
       ...commentList,
       {
@@ -48,14 +48,20 @@ const VideoPost = (props) => {
         comment: comment,
       },
     ];
-
+  
     // add comments in firebase
     let postObject = props.postObj;
+  
+    // Ensure that the comments property is initialized as an array
+    postObject.comments = postObject.comments || [];
+  
     postObject.comments.push({ uid: currentUser.uid, comment: comment });
+  
     await firebaseDB.collection("posts").doc(postObject.pid).set(postObject);
     setCommentList(newCommentList);
     setComment("");
   };
+  
   const redirectToProfile = (userId) => {
     window.location.href = `http://localhost:3000/profile/${userId}`;
   }
@@ -86,32 +92,33 @@ const VideoPost = (props) => {
   }
 
   useEffect(async () => {
-    let uid = props.postObj.uid;
-    let doc = await firebaseDB.collection("users").doc(uid).get();
-    let user = doc.data();
-    let likes = props.postObj.likes;
-    let updatedCommentList = [];
+    try {
+      let uid = props.postObj.uid;
+      let doc = await firebaseDB.collection("users").doc(uid).get();
+      let user = doc.data();
+      let commentList = props.postObj.comments;
+      let likes = props.postObj.likes || []; // Ensure that likes is initialized as an array
+      let updatedCommentList = [];
 
-    for (let i = 0; i < commentList.length; i++) {
-      let commentObj = commentList[i];
-      let doc = await firebaseDB.collection("users").doc(commentObj.uid).get();
-      let commentUserPic = doc.data().profileImageUrl;
-      updatedCommentList.push({
-        profilePic: commentUserPic,
-        comment: commentObj.comment,
-      });
-    }
-    if (likes.includes(currentUser.uid)) {
-      setIsLiked(true);
-      setLikesCount(likes.length);
-    } else {
-      if(likes.length){
-        setLikesCount(likes.length);
+      for (let i = 0; i < commentList.length; i++) {
+        let commentObj = commentList[i];
+        let doc = await firebaseDB.collection("users").doc(commentObj.uid).get();
+        let commentUserPic = doc.data().profileImageUrl;
+        updatedCommentList.push({
+          profilePic: commentUserPic,
+          comment: commentObj.comment,
+        });
       }
+  
+      setIsLiked(likes.includes(currentUser.uid));
+      setLikesCount(likes.length);
+      setUser(user);
+      setCommentList(updatedCommentList);
+    } catch (error) {
+      console.error("Error fetching user data", error);
     }
-    setUser(user);
-    setCommentList(updatedCommentList);
-  }, []); 
+  }, [props.postObj, commentList, currentUser.uid]);
+  
 
   return (
     <Container>
