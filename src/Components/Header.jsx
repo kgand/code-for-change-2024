@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { AppBar, Toolbar, makeStyles, Button, Typography, Menu, MenuItem } from "@material-ui/core";
 import { AuthContext } from "../context/AuthProvider";
 import { NavLink } from "react-router-dom";
+import { useFilter } from '../FilterContext';
 import { firebaseDB } from "../config/firebase";
 import Avatar from '@material-ui/core/Avatar';
 import HomeIcon from '@material-ui/icons/Home';
@@ -24,10 +25,7 @@ const Header = () => {
     const [profilePic, setProfilePic] = useState(null);
     const [anchorElGender, setAnchorElGender] = useState(null);
     const [anchorElClothing, setAnchorElClothing] = useState(null);
-    const [filterTags, setFilterTags] = useState({
-        gender: 'all',
-        clothingType: 'all'
-    });
+    const { selectedTags, setSelectedTags } = useFilter();
 
     const classes = useStyles();
 
@@ -41,12 +39,8 @@ const Header = () => {
     };
 
     const handleFilter = (category, value) => {
-        setFilterTags({ ...filterTags, [category]: value });
+        setSelectedTags({...selectedTags, [category]: value })
         handleClose(category);
-        // Perform filtering logic here based on selected tags
-        // Update your video display accordingly
-        // For example:
-        // fetchVideosByTags(value);
     };
 
     useEffect(() => {
@@ -104,6 +98,7 @@ const Header = () => {
                     >
                         <MenuItem onClick={() => handleFilter('gender', 'men')}>Men</MenuItem>
                         <MenuItem onClick={() => handleFilter('gender', 'women')}>Women</MenuItem>
+                        <MenuItem onClick={() => handleFilter('gender', 'all')}>All</MenuItem>
                     </Menu>
                     <Button
                         aria-controls="clothing-menu"

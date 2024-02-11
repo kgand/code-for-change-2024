@@ -10,6 +10,7 @@ import Login from "./Components/Login";
 import Profile from "./Components/Profile";
 import Signup from "./Components/Signup";
 import { AuthContext } from "./context/AuthProvider";
+import { FilterProvider } from "./FilterContext";
 
 function App() {
   let { currentUser } = useContext(AuthContext);
@@ -18,6 +19,7 @@ function App() {
     // Conditional Routing - can access profile and feed page only when logged in
     <Router>
       <div className="App">
+
         <Switch>
           {currentUser ? (
             <>
@@ -32,7 +34,8 @@ function App() {
               <Redirect to="/login"></Redirect>
             </>
           )}
-        </Switch>
+ 
+          </Switch>
       </div>
     </Router>
   );

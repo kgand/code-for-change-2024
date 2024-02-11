@@ -5,7 +5,8 @@ import PhotoCamera from "@material-ui/icons/PhotoCamera";
 import { firebaseDB, firebaseStorage, timeStamp } from "../config/firebase";
 import { v4 as uuid } from "uuid";
 import VideoPost from "./VideoPost";
-import Header from './Header';
+import Header from "./Header";
+import { useFilter } from "../FilterContext";
 
 const Feeds = () => {
   const MAX_FILE_SIZE_LIMIT_IN_MB = 20;
@@ -15,6 +16,8 @@ const Feeds = () => {
   const [uploadVideoError, setUploadVideoError] = useState("");
   const { currentUser } = useContext(AuthContext);
   const [openModal, setOpenModal] = useState(false);
+  const { selectedTags } = useFilter();
+  const { gender: headerGender, clothingType: headerClothingType } = selectedTags;
   let [gender, setGender] = useState('');
   let [clothingType, setClothingType] = useState('');
 
@@ -102,22 +105,28 @@ const Feeds = () => {
 
         // Filter posts based on selected tags
         const filteredPosts = allPosts.filter(post => {
-          if (gender && clothingType) {
-            return post.tags && post.tags.gender === gender && post.tags.clothingType === clothingType;
-          } else if (gender) {
-            return post.tags && post.tags.gender === gender;
-          } else if (clothingType) {
-            return post.tags && post.tags.clothingType === clothingType;
+          if (headerGender === "all" && headerClothingType !== "all") {
+              return post.tags && post.tags.clothingType === headerClothingType;
+          } else if (headerClothingType === "all" && headerGender !== "all") {
+              return post.tags && post.tags.gender === headerGender;
+          } else if (headerGender === "all" && headerClothingType === "all") {
+              return true; // Show all posts
+          } else if (headerGender && headerClothingType) {
+              return post.tags && post.tags.gender === headerGender && post.tags.clothingType === headerClothingType;
+          } else if (headerGender) {
+              return post.tags && post.tags.gender === headerGender;
+          } else if (headerClothingType) {
+              return post.tags && post.tags.clothingType === headerClothingType;
           } else {
-            return true; // No filtering
+              return true; // No filtering
           }
-        });
+      });
 
-        console.log("Filtered posts based on tags:", filteredPosts);
+        console.log("Filtered posts based on tags:", headerGender);
 
         setPosts(filteredPosts);
       });
-  }, [gender, clothingType]);
+  }, [gender, clothingType, headerGender, headerClothingType]);
 
 
 
