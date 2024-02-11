@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { firebaseDB, timeStamp } from "../config/firebase";
+import {Link} from "react-router-dom"
 import { AuthContext } from "../context/AuthProvider";
 import {
   Card,
@@ -12,6 +13,7 @@ import {
 } from "@material-ui/core";
 import { Favorite, FavoriteBorder } from "@material-ui/icons";
 import Box from '@material-ui/core/Box';
+import { NavLink } from "react-router-dom/cjs/react-router-dom.min";
 
 const VideoPost = (props) => {
   let [user, setUser] = useState(null);
@@ -28,6 +30,9 @@ const VideoPost = (props) => {
 
   let classes = useStyles();
 
+  const redirectToProfile = (userId) => {
+    window.location.href = `http://localhost:3000/profile/${userId}`;
+  }
  
   const toggleLikeIcon = async () =>{
     if(isLiked){
@@ -82,14 +87,14 @@ const VideoPost = (props) => {
           backgroundColor:"#ffffff",
         }}
       >
-        <div style={{display:"flex" }}>
-          <Avatar style={{ marginBottom:"0.7rem" }} src={ user ? user.profileImageUrl : ""} />
-          <Typography style={{ marginLeft:"0.2rem" }}>
+        <Link style={{textDecoration: 'none', color:'black' }} to={`/profile/${user ? user.userId : ''}`}>
+          <Avatar style={{ marginBottom: "0.7rem" }} src={user ? user.profileImageUrl : ""} />
+          <Typography style={{ marginLeft: "0.2rem" }}>
             <Box fontWeight="fontWeightBold" m={1}>
               {user ? user.username : ""}
             </Box>
           </Typography>
-        </div>
+        </Link>
 
         <div className="video-container">
           <Video

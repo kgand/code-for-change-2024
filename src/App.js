@@ -23,6 +23,7 @@ function App() {
             <>
               <Route path="/" component={Feeds} exact></Route>
               <Route path="/profile" component={Profile} exact></Route>
+              <Route path="/profile/:userid" component={Profile}></Route>
               <Redirect to="/"></Redirect>
             </>
           ) : (
